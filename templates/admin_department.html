@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ department_name }} Feedback</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body Styling */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #121212;
+      color: #fff;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      background-color: #004B72;
+      padding: 20px;
+      text-align: center;
+      color: #fff;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+    }
+
+    /* Main Content Area */
+    .container {
+      margin: 2em auto;
+      width: 80%;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #FFB03B;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #B0B0B0;
+    }
+
+    /* Flash Message */
+    .flash-message {
+      color: green;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    /* Feedback List */
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      background-color: #1A1A1A;
+      margin-bottom: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    li:hover {
+      transform: translateY(-10px);
+      background-color: #333;
+    }
+
+    /* Sentiment */
+    .sentiment {
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .positive {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+
+    .neutral {
+      background-color: #FFEB3B;
+      color: #333;
+    }
+
+    .negative {
+      background-color: #F44336;
+      color: #fff;
+    }
+
+    /* Suggestions */
+    .suggestions {
+      margin-left: 20px;
+    }
+
+    .suggestion-item {
+      background-color: #2C2C2C;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      color: #D3D3D3;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .suggestion-item:hover {
+      background-color: #FFB03B;
+      color: #121212;
+      transform: scale(1.05);
+    }
+
+    .approve-button {
+      background-color: #FFB03B;
+      color: #121212;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .approve-button:hover {
+      background-color: #FF8A00;
+      transform: scale(1.05);
+    }
+
+    /* Back Button */
+    a {
+      font-size: 1.1rem;
+      color: #FFB03B;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 30px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #004B72;
+      padding: 20px;
+      color: #fff;
+      text-align: center;
+    }
+
+    footer a {
+      color: #FFB03B;
+      text-decoration: none;
+      margin: 0 15px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>{{ department_name }} Feedback Dashboard</h1>
+  </header>
+
+  <!-- Main Content Area -->
+  <div class="container">
+    <h2>{{ department_name }} Feedback</h2>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-message">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    {% if feedbacks %}
+      <ul>
+        {% for f in feedbacks %}
+          <li>
+            <strong>{{ f.name }} (ID: {{ f.id }})</strong> said:
+            <p><em>"{{ f.feedback }}"</em></p>
+
+            <div>
+              <strong>Sentiment:</strong> 
+              <span class="sentiment 
+                {% if f.sentiment == 'positive' %} positive
+                {% elif f.sentiment == 'neutral' %} neutral
+                {% else %} negative {% endif %}">
+                {{ f.sentiment }}
+              </span>
+            </div>
+
+            <div>
+              <strong>Possible AI Fixes:</strong>
+              <div class="suggestions">
+                {% for s in f.suggestions %}
+                  <div class="suggestion-item">
+                    {{ s }}
+                    <form action="{{ url_for('approve_suggestion') }}" method="POST" style="display: inline;">
+                      <input type="hidden" name="customer_id" value="{{ f.id }}">
+                      <input type="hidden" name="suggestion" value="{{ s }}">
+                      <input type="hidden" name="feedback_text" value="{{ f.feedback }}">
+                      <input type="hidden" name="department_key" value="{{ department_key }}">
+                      <button class="approve-button" type="submit">Approve & Send</button>
+                    </form>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            {% if f.approved_suggestion %}
+              <p style="color: green;"><strong>Approved Suggestion:</strong> {{ f.approved_suggestion }}</p>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No feedback for this department yet.</p>
+    {% endif %}
+
+    <br/>
+    <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Feedback Management System | <a href="{{ url_for('logout') }}">Logout</a></p>
+  </footer>
+</body>
+</html>

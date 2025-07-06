@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ department_name }} - Dashboard | Loop-IQ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #0f172a;
+      --secondary: #f59e0b;
+      --accent: #10b981;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --dark: #0f172a;
+      --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-secondary: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+      --gradient-accent: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      color: var(--light);
+      line-height: 1.6;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Floating Elements */
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .floating-element {
+      position: absolute;
+      opacity: 0.1;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-element:nth-child(1) {
+      top: 10%;
+      left: 10%;
+      font-size: 3rem;
+      color: var(--secondary);
+      animation-delay: 0s;
+    }
+
+    .floating-element:nth-child(2) {
+      top: 20%;
+      right: 15%;
+      font-size: 2.5rem;
+      color: var(--accent);
+      animation-delay: 2s;
+    }
+
+    .floating-element:nth-child(3) {
+      bottom: 20%;
+      left: 20%;
+      font-size: 2rem;
+      color: var(--secondary);
+      animation-delay: 4s;
+    }
+
+    .floating-element:nth-child(4) {
+      bottom: 30%;
+      right: 10%;
+      font-size: 2.8rem;
+      color: var(--accent);
+      animation-delay: 1s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    /* Header */
+    header {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1.5rem 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-title h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--gradient-secondary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-title i {
+      font-size: 2.5rem;
+      color: var(--secondary);
+    }
+
+    .user-info {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+    }
+
+    .user-info i {
+      color: var(--secondary);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 8rem 2rem 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Flash Messages */
+    .flash-message {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-weight: 500;
+      animation: slideInDown 0.6s ease-out;
+    }
+
+    .flash-success {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #10b981;
+    }
+
+    .flash-error {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    /* Department Stats */
+    .dept-stats {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .dept-stats h2 {
+      color: var(--secondary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .stat-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-item:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--secondary);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--gray);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    /* Feedback Section */
+    .feedback-section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .feedback-section h3 {
+      color: var(--secondary);
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .feedback-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .feedback-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .feedback-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--gradient-secondary);
+      border-radius: 16px 0 0 16px;
+    }
+
+    .feedback-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .feedback-meta {
+      color: var(--gray);
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .customer-info {
+      font-weight: 700;
+      color: var(--secondary);
+      font-size: 1.1rem;
+    }
+
+    .sentiment {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sentiment.positive {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .sentiment.neutral {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--secondary);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .sentiment.negative {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .feedback-text {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      font-style: italic;
+      position: relative;
+      backdrop-filter: blur(10px);
+    }
+
+    .feedback-text::before {
+      content: '"';
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      font-size: 3rem;
+      color: var(--secondary);
+      opacity: 0.3;
+    }
+
+    /* AI Suggestions */
+    .ai-suggestions {
+      margin: 1.5rem 0;
+    }
+
+    .ai-suggestions strong {
+      color: var(--secondary);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .suggestions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .suggestion-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .suggestion-item:hover {
+      border-color: var(--accent);
+      transform: translateX(5px);
+    }
+
+    .suggestion-text {
+      color: var(--light);
+      flex: 1;
+      line-height: 1.5;
+    }
+
+    .suggestion-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .approve-button {
+      background: var(--gradient-accent);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .approve-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Response Form */
+    .response-form {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .response-form strong {
+      color: var(--secondary);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .response-form textarea {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--light);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      resize: vertical;
+      min-height: 100px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .response-form textarea:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+
+    .response-form button {
+      background: var(--gradient-secondary);
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .response-form button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Navigation */
+    .nav-links {
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .nav-links a {
+      background: var(--gradient-secondary);
+      color: white;
+      text-decoration: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .nav-links a:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    /* No Feedback State */
+    .no-feedback {
+      text-align: center;
+      color: var(--gray);
+      font-style: italic;
+      padding: 4rem 2rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .no-feedback i {
+      font-size: 3rem;
+      color: var(--secondary);
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Animations */
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 6rem 1rem 1rem;
+      }
+
+      .header-content {
+        padding: 0 1rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .header-title h1 {
+        font-size: 1.5rem;
+      }
+
+      .feedback-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .suggestion-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Elements -->
+  <div class="floating-elements">
+    <div class="floating-element">
+      <i class="fas fa-comments"></i>
+    </div>
+    <div class="floating-element">
+      <i class="fas fa-lightbulb"></i>
+    </div>
+    <div class="floating-element">
+      <i class="fas fa-chart-line"></i>
+    </div>
+    <div class="floating-element">
+      <i class="fas fa-star"></i>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <div class="header-title">
+        <i class="fas fa-building"></i>
+        <h1>{{ department_name }} Dashboard</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        Welcome, {{ admin.full_name or admin.username }}
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">
+            <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Department Stats -->
+    <div class="dept-stats">
+      <h2>
+        <i class="fas fa-chart-bar"></i>
+        {{ department_name }} Overview
+      </h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">{{ feedbacks|length }}</div>
+          <div class="stat-label">Total Feedback</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ department_score }}</div>
+          <div class="stat-label">Department Points</div>
+        </div>
+        <div class="stat-item">
+          {% set positive_count = feedbacks | selectattr('sentiment', 'equalto', 'Positive') | list | length %}
+          <div class="stat-number">{{ positive_count }}</div>
+          <div class="stat-label">Positive Feedback</div>
+        </div>
+        <div class="stat-item">
+          {% set negative_count = feedbacks | selectattr('sentiment', 'equalto', 'Negative') | list | length %}
+          <div class="stat-number">{{ negative_count }}</div>
+          <div class="stat-label">Negative Feedback</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback Section -->
+    <div class="feedback-section">
+      <h3>
+        <i class="fas fa-comment-dots"></i>
+        Recent Feedback for {{ department_name }}
+      </h3>
+      
+      {% if feedbacks %}
+        {% for feedback in feedbacks %}
+        <div class="feedback-item">
+          <div class="feedback-header">
+            <div>
+              <span class="customer-info">{{ feedback.name }}</span> (ID: {{ feedback.customer_id }})
+              <span class="sentiment {{ feedback.sentiment.lower() }}">{{ feedback.sentiment }}</span>
+            </div>
+            <div class="feedback-meta">
+              <i class="fas fa-clock"></i>
+              {{ feedback.created_at.strftime('%Y-%m-%d %H:%M') if feedback.created_at else 'Recently' }}
+            </div>
+          </div>
+          
+          <div class="feedback-text">
+            {{ feedback.feedback }}
+          </div>
+
+          <!-- AI Suggestions -->
+          {% if feedback.suggestions %}
+          <div class="ai-suggestions">
+            <strong><i class="fas fa-robot"></i> AI Suggestions:</strong>
+            <div class="suggestions-list">
+              {% for suggestion in feedback.suggestions %}
+              <div class="suggestion-item">
+                <div class="suggestion-text">{{ suggestion }}</div>
+                <div class="suggestion-actions">
+                  <form action="{{ url_for('approve_suggestion') }}" method="POST" style="display: inline;">
+                    <input type="hidden" name="feedback_id" value="{{ feedback.id }}">
+                    <input type="hidden" name="suggestion" value="{{ suggestion }}">
+                    <input type="hidden" name="department_key" value="{{ department_key }}">
+                    <button class="approve-button" type="submit">
+                      <i class="fas fa-check"></i>
+                      Approve & Send
+                    </button>
+                  </form>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Response Form -->
+          <div class="response-form">
+            <strong><i class="fas fa-edit"></i> Write Custom Response:</strong>
+            <form method="POST" action="{{ url_for('department_send_response', department_key=department_key) }}">
+              <input type="hidden" name="feedback_id" value="{{ feedback.id }}">
+              <textarea name="response" placeholder="Write your custom response to this feedback..." required></textarea>
+              <button type="submit">
+                <i class="fas fa-paper-plane"></i>
+                Send Custom Response
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-feedback">
+          <i class="fas fa-inbox"></i>
+          <p>No feedback assigned to {{ department_name }} yet.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-links">
+      <a href="{{ url_for('logout') }}">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+      </a>
+    </div>
+  </div>
+</body>
+</html>

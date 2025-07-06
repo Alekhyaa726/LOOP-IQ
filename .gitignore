@@ -1,0 +1,41 @@
+﻿# Environment Variables
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.class
+*.pyc
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+feedback.db
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+.qodo/
+
+# OS
+.DS_Store
+_MACOSX/
+
+# Virtual Environment
+venv/
+env/
+
+# Temporary files
+*.tmp
+cookies.txt
+
+# Development files
+clear_database.py
+create_admin.py
+create_database.py

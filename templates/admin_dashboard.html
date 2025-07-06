@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Loop-IQ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #f59e0b;
+      --accent: #10b981;
+      --dark: #0f172a;
+      --darker: #020617;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --gray-light: #e2e8f0;
+      --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: var(--light);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background Animation */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+      z-index: -1;
+      animation: backgroundShift 20s ease-in-out infinite;
+    }
+
+    @keyframes backgroundShift {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.1) rotate(1deg); }
+    }
+
+    /* Floating Elements */
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .floating-element {
+      position: absolute;
+      opacity: 0.1;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .floating-element:nth-child(1) {
+      top: 15%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .floating-element:nth-child(2) {
+      top: 70%;
+      right: 15%;
+      animation-delay: 2s;
+    }
+
+    .floating-element:nth-child(3) {
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+
+    .floating-element:nth-child(4) {
+      top: 40%;
+      right: 30%;
+      animation-delay: 6s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    /* Header */
+    header {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1.5rem 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-secondary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      color: var(--light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-secondary);
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    .nav-link:hover::after {
+      width: 80%;
+    }
+
+    /* Logout Button */
+    .logout-button {
+      background: var(--gradient-secondary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .logout-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    /* Main Content */
+    main {
+      padding-top: 120px;
+      padding: 2rem;
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .dashboard-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .dashboard-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .dashboard-subtitle {
+      font-size: 1.25rem;
+      color: var(--gray);
+      margin-bottom: 2rem;
+    }
+
+
+
+    /* Departments List */
+    .departments {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      padding: 0;
+      list-style: none;
+    }
+
+    .department-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .department-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-secondary);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .department-card:hover {
+      transform: translateY(-8px);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .department-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .department-link {
+      display: block;
+      padding: 2rem;
+      text-decoration: none;
+      color: inherit;
+      text-align: center;
+    }
+
+    .department-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--light);
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .department-card:hover .department-name {
+      color: var(--secondary);
+    }
+
+    .department-count {
+      font-size: 1rem;
+      color: var(--gray);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      display: inline-block;
+      font-weight: 500;
+    }
+
+    .department-icon {
+      font-size: 2rem;
+      color: var(--secondary);
+      margin-bottom: 1rem;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
+
+    .department-card:hover .department-icon {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--darker);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--gray);
+      text-align: center;
+      padding: 2rem 0;
+      margin-top: 3rem;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .footer-links {
+      margin-bottom: 1rem;
+    }
+
+    .footer-link {
+      color: var(--secondary);
+      text-decoration: none;
+      margin: 0 1rem;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--light);
+    }
+
+    /* Animations */
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0 1rem;
+      }
+
+      .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      .departments {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-summary {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Loading animation */
+    .loading {
+      opacity: 0;
+      animation: slideInUp 0.6s ease forwards;
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Elements -->
+  <div class="floating-elements">
+    <div class="floating-element">
+      <i class="fas fa-chart-bar" style="font-size: 2rem; color: var(--secondary);"></i>
+    </div>
+    <div class="floating-element">
+      <i class="fas fa-users" style="font-size: 2rem; color: var(--primary);"></i>
+    </div>
+    <div class="floating-element">
+      <i class="fas fa-building" style="font-size: 2rem; color: var(--accent);"></i>
+    </div>
+    <div class="floating-element">
+      <i class="fas fa-analytics" style="font-size: 2rem; color: var(--secondary);"></i>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <h1 class="header-title">Admin Dashboard</h1>
+      <nav class="nav-menu">
+        <a href="{{ url_for('admin_dashboard') }}" class="nav-link">
+          <i class="fas fa-tachometer-alt"></i>
+          Dashboard
+        </a>
+        <a href="{{ url_for('rewards') }}" class="nav-link">
+          <i class="fas fa-trophy"></i>
+          Rewards
+        </a>
+        <a href="{{ url_for('logout') }}" class="logout-button">
+          <i class="fas fa-sign-out-alt"></i>
+          Logout
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="dashboard-header">
+      <h2 class="dashboard-title">Feedback by Department</h2>
+      <p class="dashboard-subtitle">Click on a department to view feedback</p>
+    </div>
+
+
+
+    <ul class="departments">
+      {% for dept_key, feedbacks in feedback_by_dept.items() %}
+        <li class="department-card">
+          <a href="{{ url_for('admin_view_department', department_key=dept_key) }}" class="department-link">
+            <div class="department-icon">
+              <i class="fas fa-building"></i>
+            </div>
+            <div class="department-name">
+              {{ dept_key.replace('_', '/') }}
+            </div>
+            <span class="department-count">{{ feedbacks|length }} feedbacks</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="{{ url_for('home') }}" class="footer-link">Back to Home</a>
+      </div>
+      <p>&copy; 2025 Loop-IQ | All Rights Reserved</p>
+    </div>
+  </footer>
+
+  <script>
+    // Parallax effect for floating elements
+    window.addEventListener('scroll', () => {
+      const scrolled = window.pageYOffset;
+      const parallax = document.querySelectorAll('.floating-element');
+      
+      parallax.forEach((element, index) => {
+        const speed = 0.3 + (index * 0.1);
+        element.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.01}deg)`;
+      });
+    });
+
+    // Add entrance animation to elements
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animation = 'slideInUp 0.6s ease forwards';
+        }
+      });
+    }, observerOptions);
+
+    // Observe elements for animation
+    document.querySelectorAll('.department-card').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Add hover effects to interactive elements
+    document.querySelectorAll('.department-card, .nav-link').forEach(element => {
+      element.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-4px)';
+      });
+      
+      element.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Header scroll effect
+    window.addEventListener('scroll', () => {
+      const header = document.querySelector('header');
+      if (window.scrollY > 100) {
+        header.style.background = 'rgba(15, 23, 42, 0.98)';
+        header.style.boxShadow = 'var(--shadow-lg)';
+      } else {
+        header.style.background = 'rgba(15, 23, 42, 0.95)';
+        header.style.boxShadow = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
