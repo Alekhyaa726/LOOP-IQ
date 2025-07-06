@@ -6,6 +6,21 @@ import hashlib
 from random import choice, sample, randint
 import re
 import string
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+if os.getenv('VERCEL'):
+    # Production configuration for Vercel
+    app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
+    app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
+    app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
+    app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
+    app.config['MYSQL_PORT'] = int(os.getenv('MYSQL_PORT', 3306))
+else:
+    # Local development - keep your current setup
+    pass
 
 app = Flask(__name__)
 # IMPORTANT: Use an environment variable and a more secure key in a real application
@@ -1444,3 +1459,12 @@ if __name__ == '__main__':
     test_mysql_connection()
     print("🚀 Starting Flask application...")
     app.run(debug=True, port=5001)
+def handler(environ, start_response):
+    return app(environ, start_response)
+
+# For Vercel compatibility
+app = app
+
+if __name__ == '__main__':
+    debug_mode = os.environ.get('DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode)

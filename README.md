@@ -200,7 +200,7 @@ The system supports the following departments:
 - GET /admin/feedback/<dept> - View department-specific feedback
 - GET /rewards - Access rewards dashboard
 
-
+git branch -M main
 ## 🎨 Design System
 
 ### Color Palette
